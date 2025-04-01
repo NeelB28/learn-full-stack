@@ -1,5 +1,6 @@
 package com.dailycodework.dreamshops.service.product;
 
+import com.dailycodework.dreamshops.dto.ProductDto;
 import com.dailycodework.dreamshops.exceptions.ResourceNotFoundException;
 import com.dailycodework.dreamshops.model.Category;
 import com.dailycodework.dreamshops.model.Product;
@@ -7,9 +8,8 @@ import com.dailycodework.dreamshops.repository.CategoryRepository;
 import com.dailycodework.dreamshops.repository.ProductRepository;
 import com.dailycodework.dreamshops.request.AddProductRequest;
 import com.dailycodework.dreamshops.request.ProductUpdateRequest;
-import com.dailycodework.dreamshops.exceptions.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +22,8 @@ public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    // now we will need a dependency to use dto and we will use constructor injection to inject the dependency here
+    private final ModelMapper modelMapper;
 
     @Override
     public Product addProduct(AddProductRequest request) {
@@ -132,5 +134,17 @@ public class ProductService implements IProductService {
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+    // by copilot
+    @Override
+    public Product getProductWithImagesById(Long productId) {
+        return productRepository.findByIdWithImages(productId).orElseThrow(
+                        () -> new ResourceNotFoundException("Product with id: " + productId + " not found"));
+    }
+
+    @Override
+    public ProductDto convertToDto(Product product) {
+        return modelMapper.map(product, ProductDto.class);
     }
 }

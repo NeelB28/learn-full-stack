@@ -9,6 +9,7 @@ import com.dailycodework.dreamshops.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,22 +30,26 @@ public class ProductController {
 
     // get all products
     @GetMapping("/all")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getAllProdcucts() {
+        //List<Product> productList = productService.getAllProductsWithImages();
         List<Product> productList = productService.getAllProducts();
         return ResponseEntity.ok(new ApiResponse("Success", productList));
     }
 
     // get product by id
     @GetMapping("/product/{productId}/product")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getProductById(@PathVariable("productId") Long id) {
 //        return Optional.ofNullable(productService.getProductById(id))
 //                .map(product -> ResponseEntity.ok(new ApiResponse("Success", product)))
 //                .orElse(ResponseEntity.notFound().build());
         try {
+            //Product product = productService.getProductWithImagesById(id);
             Product product = productService.getProductById(id);
             return ResponseEntity.ok(new ApiResponse("Success", product));
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null ));
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
 //        if (product != null) {
 //            return ResponseEntity.ok(new ApiResponse("Success", product));
@@ -57,7 +62,8 @@ public class ProductController {
     // add the product, using @RequestBody coz product will be added by user so developer java will request the data
     // from the user
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest product){
+    @Transactional
+    public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest product) {
         try {
             Product newProduct = productService.addProduct(product);
             return ResponseEntity.ok(new ApiResponse("Product added successfully", newProduct));
@@ -71,6 +77,7 @@ public class ProductController {
 
     // update the product
     @PutMapping("/product/{productId}/update")
+    @Transactional
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable("productId") Long id, @RequestBody ProductUpdateRequest product) {
         // purpose of try and catch is that we have added an exception in the updateProduct method of productService
         // class and if it is not found then it will throw the exception so we have to handle it here using cath, which will
@@ -105,6 +112,7 @@ public class ProductController {
 
     // get products by brand and name
     @GetMapping("/products/by/brand-and-name")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getProductsByBrandAndName(@RequestParam String brand, @RequestParam String name) {
 //        try {
 //            List<Product> products = productService.getProductsByBrandAndName(brand, name);
@@ -131,6 +139,7 @@ public class ProductController {
 
     // get products by category and brand
     @GetMapping("/products/by/category-and-brand")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getProductsByCategoryAndBrand(@RequestParam String category, @RequestParam String brand) {
         try {
             return Optional.ofNullable(productService.getProductsByCategoryAndBrand(category, brand))
@@ -143,6 +152,7 @@ public class ProductController {
 
     // get products by name
     @GetMapping("/products/{name}/products")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getProductsByName(@PathVariable String name) {
         try {
             return Optional.ofNullable(productService.getProductsByName(name))
@@ -155,6 +165,7 @@ public class ProductController {
 
     // get products by brand
     @GetMapping("/product/by-brand")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getProductsByBrand(@RequestParam String brand) {
         try {
             return Optional.ofNullable(productService.getProductsByBrand(brand))
@@ -167,6 +178,7 @@ public class ProductController {
 
     // get products by category
     @GetMapping("/product/{category}/all/products")
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse> getProductsByCategory(@PathVariable String category) {
         try {
             return Optional.ofNullable(productService.getProductsByCategory(category))
@@ -181,7 +193,7 @@ public class ProductController {
     @GetMapping("/products/count/by/brand-and-name")
     public ResponseEntity<ApiResponse> countProductsByBrandAndName(@RequestParam String brand, @RequestParam String name) {
         try {
-            if(productService.getProductsByBrandAndName(brand, name) == null) {
+            if (productService.getProductsByBrandAndName(brand, name) == null) {
                 return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Brand or name not found", null));
             }
             var count = productService.countProductsByBrandAndName(brand, name);
@@ -190,4 +202,16 @@ public class ProductController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
+
+    // New endpoint to get product with images
+    @GetMapping("/product/{productId}/with-images")
+    public ResponseEntity<ApiResponse> getProductWithImagesById(@PathVariable("productId") Long id) {
+        try {
+            Product product = productService.getProductWithImagesById(id);
+            return ResponseEntity.ok(new ApiResponse("Success", product));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
 }

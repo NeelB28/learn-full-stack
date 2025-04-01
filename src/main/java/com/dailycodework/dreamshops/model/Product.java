@@ -34,7 +34,8 @@ public class Product {
     // mappedBy attribute is used to specify the entity that owns the relationship
     // in simple words, the entity that has the foreign key column and here it is Image entity
     // and mappedBy = "product" means that the product field in the Image entity is the owning side of the relationship
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // Remove @JsonIgnore to include images in the response
     @JsonIgnore
     private List<Image> images;
 

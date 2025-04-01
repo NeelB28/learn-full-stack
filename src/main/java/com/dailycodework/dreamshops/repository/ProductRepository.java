@@ -2,8 +2,11 @@ package com.dailycodework.dreamshops.repository;
 
 import com.dailycodework.dreamshops.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryName(String category); // custom method
@@ -17,6 +20,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByBrandAndName(String brand, String name);
 
     Long countByBrandAndName(String brand, String name);
+
+    // Custom method to find product by ID with images eagerly loaded
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.images WHERE p.id = :id")
+    Optional<Product> findByIdWithImages(@Param("id") Long id);
+
     // so the rule of custom method is that you have to use findBy or countBy
     // then the property name of the entity class on which you want to search cant use non-existing property/
     // entity class property
