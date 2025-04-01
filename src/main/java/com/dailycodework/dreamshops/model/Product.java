@@ -1,5 +1,6 @@
 package com.dailycodework.dreamshops.model;
 // @AllArgsConstructor removed as we are using custom constructor
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class Product {
     // in simple words, the entity that has the foreign key column and here it is Image entity
     // and mappedBy = "product" means that the product field in the Image entity is the owning side of the relationship
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Image> images;
 
     public Product(String name, String brand, double price, int inventory, String description, Category category) {
