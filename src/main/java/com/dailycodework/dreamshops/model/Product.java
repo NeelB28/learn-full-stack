@@ -36,7 +36,6 @@ public class Product {
     // and mappedBy = "product" means that the product field in the Image entity is the owning side of the relationship
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     // Remove @JsonIgnore to include images in the response
-    @JsonIgnore
     private List<Image> images;
 
     public Product(String name, String brand, double price, int inventory, String description, Category category) {

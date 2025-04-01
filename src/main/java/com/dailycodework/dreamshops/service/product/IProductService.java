@@ -29,4 +29,5 @@ public interface IProductService {
     Product getProductWithImagesById(Long id);
 
     ProductDto convertToDto(Product product);
+    List<ProductDto> getConvertedProducts(List<Product> products);
 }

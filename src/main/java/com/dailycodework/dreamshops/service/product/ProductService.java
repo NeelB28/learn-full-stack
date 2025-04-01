@@ -1,10 +1,13 @@
 package com.dailycodework.dreamshops.service.product;
 
+import com.dailycodework.dreamshops.dto.ImageDto;
 import com.dailycodework.dreamshops.dto.ProductDto;
 import com.dailycodework.dreamshops.exceptions.ResourceNotFoundException;
 import com.dailycodework.dreamshops.model.Category;
+import com.dailycodework.dreamshops.model.Image;
 import com.dailycodework.dreamshops.model.Product;
 import com.dailycodework.dreamshops.repository.CategoryRepository;
+import com.dailycodework.dreamshops.repository.ImageRepository;
 import com.dailycodework.dreamshops.repository.ProductRepository;
 import com.dailycodework.dreamshops.request.AddProductRequest;
 import com.dailycodework.dreamshops.request.ProductUpdateRequest;
@@ -24,6 +27,7 @@ public class ProductService implements IProductService {
     private final CategoryRepository categoryRepository;
     // now we will need a dependency to use dto and we will use constructor injection to inject the dependency here
     private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
     @Override
     public Product addProduct(AddProductRequest request) {
@@ -143,8 +147,25 @@ public class ProductService implements IProductService {
                         () -> new ResourceNotFoundException("Product with id: " + productId + " not found"));
     }
 
+    public List<ProductDto> getConvertedProducts(List<Product> products) {
+        return products.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
     @Override
     public ProductDto convertToDto(Product product) {
-        return modelMapper.map(product, ProductDto.class);
+    ProductDto productDto = modelMapper.map(product, ProductDto.class); // apart from the default mapping, we can also use custom mapping
+        // our product model is having till category but not image so we need to add the image in it as our dtoproduct is having it
+        List<Image> images = imageRepository.findByProductId(product.getId());
+        List<ImageDto> imageDtos = images.stream()
+                .map(image -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        // flow is like this
+        // declare a list of imageDtos
+        // each image in the list of images is mapped to imageDto for a particular product
+        // then we set the imageDtos to productDto
+        productDto.setImages(imageDtos);
+        return productDto;
     }
 }

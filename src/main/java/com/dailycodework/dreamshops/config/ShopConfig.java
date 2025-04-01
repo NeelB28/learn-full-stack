@@ -2,8 +2,10 @@ package com.dailycodework.dreamshops.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-public class ShowConfig {
+@Configuration
+public class ShopConfig {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();

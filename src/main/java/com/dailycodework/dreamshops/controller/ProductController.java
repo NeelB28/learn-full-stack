@@ -1,5 +1,6 @@
 package com.dailycodework.dreamshops.controller;
 
+import com.dailycodework.dreamshops.dto.ProductDto;
 import com.dailycodework.dreamshops.exceptions.ResourceNotFoundException;
 import com.dailycodework.dreamshops.model.Product;
 import com.dailycodework.dreamshops.request.AddProductRequest;
@@ -34,7 +35,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getAllProdcucts() {
         //List<Product> productList = productService.getAllProductsWithImages();
         List<Product> productList = productService.getAllProducts();
-        return ResponseEntity.ok(new ApiResponse("Success", productList));
+        List<ProductDto> convertedProductList = productService.getConvertedProducts(productList);
+        return ResponseEntity.ok(new ApiResponse("Success", convertedProductList));
     }
 
     // get product by id
@@ -47,7 +49,10 @@ public class ProductController {
         try {
             //Product product = productService.getProductWithImagesById(id);
             Product product = productService.getProductById(id);
-            return ResponseEntity.ok(new ApiResponse("Success", product));
+            ProductDto productDto = productService.convertToDto(product);
+//            var productDto = productService.convertToDto(product);
+            // var helps to infer the type of the variable
+            return ResponseEntity.ok(new ApiResponse("Success", productDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -123,8 +128,9 @@ public class ProductController {
         // now here we need to add if-else coz service is not checking null exception so either use if-else or optional.ofNullable
         try {
             List<Product> products = productService.getProductsByBrandAndName(brand, name);
+            List<ProductDto> convertedProducts = productService.getConvertedProducts(products);
             if (products != null) {
-                return ResponseEntity.ok(new ApiResponse("Success", products));
+                return ResponseEntity.ok(new ApiResponse("Success", convertedProducts));
             } else {
                 return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Product not found", null));
             }

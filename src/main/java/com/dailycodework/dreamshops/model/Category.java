@@ -20,11 +20,11 @@ public class Category {
     private Long id;
     private String name;
 
-    // one category can have many products so the products are clustered/mapped by the category
+    // one category can have many products so the products
+    // are clustered/mapped by the category
     @OneToMany(mappedBy = "category")
     @JsonIgnore
     private List<Product> products;
-
     public Category(String name) {
         this.name = name;
     }
