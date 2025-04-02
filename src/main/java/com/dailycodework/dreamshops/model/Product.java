@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class Product {
     private Long id;
     private String name;
     private String brand;
-    private double price;
+    private BigDecimal price;
     private int inventory;
     private String description;
 
@@ -38,7 +39,7 @@ public class Product {
     // Remove @JsonIgnore to include images in the response
     private List<Image> images;
 
-    public Product(String name, String brand, double price, int inventory, String description, Category category) {
+    public Product(String name, String brand, BigDecimal price, int inventory, String description, Category category) {
         this.name = name;
         this.brand = brand;
         this.price = price;
